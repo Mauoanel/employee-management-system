@@ -1,0 +1,205 @@
+@startuml
+class com.xib.assessment.controller.ManagerController {
+- ManagerService managerService
++ ResponseEntity findManager(String)
++ ResponseEntity createManager(ManagerDto)
++ ResponseEntity assignManagerToTeam(String,long)
++ ResponseEntity unassignManagerToTeam(String,long)
+}
+class com.xib.assessment.apirerror.ApiError {
+- String errorMessage
+- BusinessRule businessRuleMessage
++ BusinessRule getBusinessRuleMessage()
++ void setBusinessRuleMessage(BusinessRule)
++ String getErrorMessage()
++ void setErrorMessage(String)
++ String toString()
+}
+class com.xib.assessment.entity.Manager {
+- Long id
+- String firstName
+- String lastName
+- String idNumber
+- Set<Team> teams
+- Set<Agent> agents
++ Long getId()
++ void setId(Long)
++ String getFirstName()
++ void setFirstName(String)
++ String getLastName()
++ void setLastName(String)
++ String getIdNumber()
++ void setIdNumber(String)
++ Set<Team> getTeams()
++ void setTeams(Set<Team>)
++ Set<Agent> getAgents()
++ void setAgents(Set<Agent>)
++ String toString()
+}
+class com.xib.assessment.entity.Agent {
+- Long id
+- String firstName
+- String lastName
+- String idNumber
+- Team team
+- Manager manager
++ Long getId()
++ void setId(Long)
++ String getFirstName()
++ void setFirstName(String)
++ String getLastName()
++ void setLastName(String)
++ Team getTeam()
++ void setTeam(Team)
++ String getIdNumber()
++ void setIdNumber(String)
++ Manager getManager()
++ void setManager(Manager)
+}
+class com.xib.assessment.controller.AgentController {
+- AgentService agentService
++ ResponseEntity findAllAgents()
++ ResponseEntity findAllAgentsWithPaging(Integer,Integer)
++ ResponseEntity findAgent(long)
++ ResponseEntity createAgent(AgentDto)
+}
+class com.xib.assessment.sterotypes.LoadTestData {
+- AgentRepository agentRepository
+- ManagerRepository managerRepository
+- TeamRepository teamRepository
++ void execute()
+- Team createTeam(String,Manager)
+- void createAgent(String,String,String,Team,Manager)
+- Manager createManager(String,String,String)
+}
+class com.xib.assessment.config.WebApplicationConfig {
++ void addViewControllers(ViewControllerRegistry)
++ WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> containerCustomizer()
+}
+interface com.xib.assessment.repository.TeamRepository {
+~ boolean existsByNameIgnoreCase(String)
+~ List<Team> findAllByAgentsNullAndManagersNull()
+}
+interface com.xib.assessment.repository.ManagerRepository {
+~ boolean existsByIdNumberIgnoreCase(String)
+~ Manager findByIdNumberIgnoreCase(String)
+}
+class com.xib.assessment.dto.AgentDto {
+- String firstName
+- String lastName
+- String idNumber
+- Long managerId
++ String getFirstName()
++ void setFirstName(String)
++ String getLastName()
++ void setLastName(String)
++ String getIdNumber()
++ void setIdNumber(String)
++ Long getManagerId()
++ void setManagerId(Long)
++ String toString()
+}
+class com.xib.assessment.config.SwaggerConfig {
++ Docket api()
+}
+class com.xib.assessment.assembler.AppAssembler {
++ {static} Agent assembleAgent(AgentDto)
++ {static} Team assembleTeam(TeamDto)
++ {static} Manager assembleManager(ManagerDto)
+}
+class com.xib.assessment.entity.Team {
+- Long id
+- String name
+- Set<Manager> managers
+- Set<Agent> agents
++ Long getId()
++ void setId(Long)
++ String getName()
++ void setName(String)
++ Set<Manager> getManagers()
++ void setManagers(Set<Manager>)
++ Set<Agent> getAgents()
++ void setAgents(Set<Agent>)
++ String toString()
+}
+class com.xib.assessment.services.AgentService {
+- AgentRepository agentRepository
+- ManagerRepository managerRepository
++ List<Agent> findAllAgentsWithPaging(Integer,Integer)
++ List<Agent> findAllAgents()
++ Agent findAgent(long)
++ Agent saveAgent(AgentDto)
+}
+class com.xib.assessment.services.TeamService {
+- AgentRepository agentRepository
+- TeamRepository teamRepository
++ List<Team> findAllTeams()
++ Agent assignAgentToTeam(TeamDto,long)
++ Team findTeam(long)
++ Team saveTeam(TeamDto)
++ List<Team> findTeamsWithNoManagersAndAgents()
+}
+class com.xib.assessment.dto.ManagerDto {
+- long id
+- String firstName
+- String lastName
+- String idNumber
++ String getFirstName()
++ void setFirstName(String)
++ String getLastName()
++ void setLastName(String)
++ String getIdNumber()
++ void setIdNumber(String)
++ long getId()
++ void setId(long)
++ String toString()
+}
+class com.xib.assessment.controller.TeamController {
+- TeamService teamService
++ ResponseEntity findAllTeams()
++ ResponseEntity findTeamsWithNoManagersAndAgents()
++ ResponseEntity findTeam(long)
++ ResponseEntity assignAgentToTeam(long,TeamDto)
++ ResponseEntity createTeam(TeamDto)
+}
+class com.xib.assessment.AssessmentApplication {
++ {static} void main(String[])
+}
+class com.xib.assessment.apirerror.BusinessRule {
+- String message
++ String getMessage()
++ void setMessage(String)
++ String toString()
+}
+class com.xib.assessment.services.ManagerService {
+- ManagerRepository managerRepository
+- TeamRepository teamRepository
++ Manager saveManager(ManagerDto)
++ Team assignManagerToTeam(String,long)
++ Team unassignManagerToTeam(String,long)
++ Manager findManager(String)
+}
+class com.xib.assessment.dto.TeamDto {
+- long id
+- String name
+- boolean validateTeamName
++ long getId()
++ void setId(long)
++ String getName()
++ void setName(String)
++ boolean isValidateTeamName()
++ void setValidateTeamName(boolean)
++ String toString()
+}
+interface com.xib.assessment.repository.AgentRepository {
+~ boolean existsByIdNumber(String)
+~ Page<Agent> findAll(Pageable)
+}
+
+
+com.xib.assessment.apirerror.Exception <|-- com.xib.assessment.apirerror.ApiError
+org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter <|-- com.xib.assessment.config.WebApplicationConfig
+org.springframework.data.jpa.repository.JpaRepository <|-- com.xib.assessment.repository.TeamRepository
+org.springframework.data.jpa.repository.JpaRepository <|-- com.xib.assessment.repository.ManagerRepository
+org.springframework.data.jpa.repository.JpaRepository <|-- com.xib.assessment.repository.AgentRepository
+@enduml
