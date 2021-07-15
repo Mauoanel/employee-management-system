@@ -29,7 +29,7 @@ gradlew bootRun
 The easiest way to deploy the sample application to OpenShift is to use the [OpenShift CLI](https://docs.openshift.org/latest/cli_reference/index.html):
 
 ```shell
-oc new-app codecentric/springboot-maven3-centos~https://github.com/codecentric/springboot-sample-app
+oc new-app codecentric/springboot-maven3-centos~https://github.com/Mauoanel/employee-management-system
 ```
 
 This will create:
