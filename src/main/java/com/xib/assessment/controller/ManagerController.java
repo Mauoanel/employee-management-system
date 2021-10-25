@@ -2,6 +2,8 @@ package com.xib.assessment.controller;
 
 
 import com.xib.assessment.apirerror.ApiError;
+import com.xib.assessment.apirerror.NotFoundError;
+import com.xib.assessment.apirerror.ServiceSubExistError;
 import com.xib.assessment.dto.ManagerDto;
 import com.xib.assessment.services.ManagerService;
 import org.springframework.http.HttpStatus;
@@ -19,38 +21,22 @@ public class ManagerController {
     }
 
     @GetMapping("{managerIdNumber}")
-    public ResponseEntity findManager(@PathVariable("managerIdNumber") String managerIdNumber){
-        try {
-            return new ResponseEntity<>(managerService.findManager(managerIdNumber), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity findManager(@PathVariable("managerIdNumber") String managerIdNumber) throws NotFoundError {
+        return new ResponseEntity<>(managerService.findManager(managerIdNumber), HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity createManager(@RequestBody ManagerDto managerDto){
-        try {
-            return new ResponseEntity<>( managerService.saveManager(managerDto), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity createManager(@RequestBody ManagerDto managerDto) {
+        return new ResponseEntity<>(managerService.saveManager(managerDto), HttpStatus.OK);
     }
 
     @PutMapping("assign/{managerIdNumber}/team/{teamId}")
-    public ResponseEntity assignManagerToTeam(@PathVariable("managerIdNumber") String managerIdNumber,@PathVariable("teamId") long teamId){
-        try {
-            return new ResponseEntity<>(managerService.assignManagerToTeam(managerIdNumber, teamId), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity assignManagerToTeam(@PathVariable("managerIdNumber") String managerIdNumber, @PathVariable("teamId") long teamId) throws NotFoundError {
+        return new ResponseEntity<>(managerService.assignManagerToTeam(managerIdNumber, teamId), HttpStatus.OK);
     }
 
     @PutMapping("unassign/{managerIdNumber}/team/{teamId}")
-    public ResponseEntity unassignManagerToTeam(@PathVariable("managerIdNumber") String managerIdNumber,@PathVariable("teamId") long teamId){
-        try {
+    public ResponseEntity unassignManagerToTeam(@PathVariable("managerIdNumber") String managerIdNumber, @PathVariable("teamId") long teamId) throws ServiceSubExistError, NotFoundError {
             return new ResponseEntity<>(managerService.unassignManagerToTeam(managerIdNumber, teamId), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
     }
 }

@@ -2,6 +2,9 @@ package com.xib.assessment.services;
 
 
 import com.xib.assessment.apirerror.ApiError;
+import com.xib.assessment.apirerror.ExistsError;
+import com.xib.assessment.apirerror.NotFoundError;
+import com.xib.assessment.apirerror.ServiceSubExistError;
 import com.xib.assessment.assembler.AppAssembler;
 import com.xib.assessment.dto.AgentDto;
 import com.xib.assessment.dto.TeamDto;
@@ -10,6 +13,7 @@ import com.xib.assessment.entity.Manager;
 import com.xib.assessment.entity.Team;
 import com.xib.assessment.repository.AgentRepository;
 import com.xib.assessment.repository.TeamRepository;
+import org.hibernate.annotations.NotFound;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -35,11 +39,11 @@ public class TeamService {
      * @return a list of teams
      * @throws ApiError if no team found.
      */
-    public List<Team> findAllTeams() throws ApiError {
+    public List<Team> findAllTeams() throws ApiError, NotFoundError {
         List<Team> teams = teamRepository.findAll();
 
         if (teams.size() == 0)
-            throw new ApiError("No Teams found!");
+            throw new NotFoundError("No Teams found!");
 
         return teams;
     }
@@ -51,17 +55,17 @@ public class TeamService {
      * @return agent and team associated to
      * @throws ApiError
      */
-    public Agent assignAgentToTeam(TeamDto teamDto,long agentId) throws ApiError {
+    public Agent assignAgentToTeam(TeamDto teamDto,long agentId) throws ApiError, ServiceSubExistError, NotFoundError {
 
         Agent agent;
         Team team;
 
         try {
             if(!agentRepository.existsById(agentId))
-                throw new ApiError("Agent does not exists.");
+                throw new NotFoundError("Agent does not exists.");
 
             if(!teamRepository.existsById(teamDto.getId()))
-                throw new ApiError("Team does not exists.");
+                throw new NotFoundError("Team does not exists.");
 
             agent = agentRepository.getOne(agentId);
             team = teamRepository.findById(teamDto.getId()).get();
@@ -77,10 +81,10 @@ public class TeamService {
                     agentManagerManagesOtherTeams = teamManagerSet.contains(agent.getManager());
 
                     if(!agentManagerManagesOtherTeams)
-                        throw new ApiError(
+                        throw new ServiceSubExistError(
                                 "An agent can only be assigned to a team that is managed by the same manager she/he reports to.");
                 } else {
-                    throw new ApiError(
+                    throw new NotFoundError(
                             "No Managers associated with team. An agent can only be assigned to a team that is managed by the same manager she/he reports to.");
                 }
             }
@@ -89,14 +93,14 @@ public class TeamService {
 
             if(teamDto.isValidateTeamName()){
                 if(!teamDto.getName().trim().equalsIgnoreCase(team.getName().trim()))
-                    throw new ApiError("Provided Team name does not match the existing team name.");
+                    throw new NotFoundError("Provided Team name does not match the existing team name.");
             }
             agent = agentRepository.save(agent);
 
 
         }catch (Exception a){
             a.printStackTrace();
-            throw new ApiError(a.getMessage());
+            throw a;
         }
         return agent;
     }
@@ -107,14 +111,14 @@ public class TeamService {
      * @return specified team
      * @throws ApiError
      */
-    public Team findTeam(@NotNull long id) throws ApiError {
+    public Team findTeam(@NotNull long id) throws NotFoundError {
         try {
 
             return teamRepository.findById(id)
-                    .orElseThrow(() -> new ApiError("Team not found for id: " + id));
+                    .orElseThrow(() -> new NotFoundError("Team not found for id: " + id));
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ApiError(e.getMessage());
+            throw e;
         }
     }
 
@@ -124,19 +128,19 @@ public class TeamService {
      * @return saved agent
      * @throws ApiError: if team exists or mandatory fields are empty
      */
-    public Team saveTeam(TeamDto teamDto) throws ApiError {
+    public Team saveTeam(TeamDto teamDto) throws ExistsError {
 
         Team team = AppAssembler.assembleTeam(teamDto);
 
         try {
             if(teamRepository.existsByNameIgnoreCase(teamDto.getName()))
-                throw new ApiError("Team Name exists.");
+                throw new ExistsError("Team Name exists.");
 
             team = teamRepository.save(team);
 
         }catch (Exception a){
             a.printStackTrace();
-            throw new ApiError(a.getMessage());
+            throw a;
         }
         return team;
     }

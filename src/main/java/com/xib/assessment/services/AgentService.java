@@ -1,8 +1,12 @@
 package com.xib.assessment.services;
 
 
+import com.xib.assessment.apirerror.MandatoryFieldError;
+import com.xib.assessment.apirerror.NotFoundError;
+import com.xib.assessment.apirerror.ExistsError;
 import com.xib.assessment.assembler.AppAssembler;
 import com.xib.assessment.entity.Agent;
+import com.xib.assessment.entity.Manager;
 import com.xib.assessment.repository.AgentRepository;
 import com.xib.assessment.apirerror.ApiError;
 import com.xib.assessment.dto.AgentDto;
@@ -14,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AgentService {
@@ -35,7 +40,7 @@ public class AgentService {
      * @param pageNo : specifies the page number
      * @param pageSize : specifies the number of items(size) on the page
      */
-    public List<Agent> findAllAgentsWithPaging(Integer pageNo, Integer pageSize) throws ApiError {
+    public List<Agent> findAllAgentsWithPaging(Integer pageNo, Integer pageSize) throws ApiError, NotFoundError {
 
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id"));
         Page<Agent> agentsPaged = agentRepository.findAll(paging);
@@ -43,7 +48,7 @@ public class AgentService {
         List<Agent> agents;
 
         if (agentsPaged.isEmpty()) {
-            throw new ApiError("No Agents found!");
+            throw new NotFoundError("No Agents found!");
         } else {
             agents = agentsPaged.getContent();
         }
@@ -55,12 +60,12 @@ public class AgentService {
      * @return a list of agents
      * @throws ApiError if no agents found.
      */
-    public List<Agent> findAllAgents() throws ApiError {
+    public List<Agent> findAllAgents() throws ApiError, NotFoundError {
 
         List<Agent> agents = agentRepository.findAll();
 
         if (agents.isEmpty())
-            throw new ApiError("No Agents found!");
+            throw new NotFoundError("No Agents found!");
 
         return agents;
     }
@@ -72,14 +77,14 @@ public class AgentService {
      * @return :
      * @throws ApiError
      */
-    public Agent findAgent(long id) throws ApiError {
+    public Agent findAgent(long id) throws NotFoundError {
 
         try {
             return agentRepository.findById(id)
-                    .orElseThrow(() -> new ApiError("Agent not found for this id: " + id));
+                    .orElseThrow(() -> new NotFoundError("Agent not found for this id: " + id));
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ApiError(e.getMessage());
+            throw e;
         }
     }
 
@@ -90,29 +95,37 @@ public class AgentService {
      * @return saved agent
      * @throws ApiError: if agent exists or mandatory fields are empty
      */
-    public Agent saveAgent(AgentDto agentDto) throws ApiError {
+    public Agent saveAgent(AgentDto agentDto) throws NotFoundError, MandatoryFieldError, ExistsError {
 
         Agent agent = AppAssembler.assembleAgent(agentDto);
 
         try {
             if(agent.getIdNumber() == null)
-                throw new ApiError("Agent ID Number is mandatory.");
+                throw new MandatoryFieldError("Agent ID Number is mandatory.");
 
             if(agentRepository.existsByIdNumber(agent.getIdNumber()))
-                throw new ApiError("Agent exists.");
+                throw new ExistsError("Agent exists.");
 
             if(agentDto.getManagerId() == null)
-                throw new ApiError("Manager is mandatory.");
+                throw new MandatoryFieldError("Manager is mandatory.");
 
             if(!managerRepository.existsById(agentDto.getManagerId()))
-                throw new ApiError("Manager does not exist.");
+                throw new ExistsError("Manager does not exist.");
 
-            agent.setManager(managerRepository.findById(agentDto.getManagerId()).get());
+            Manager manager = null;
+            Optional<Manager> managerOptional = managerRepository.findById(agentDto.getManagerId());
+            if(managerOptional.isPresent()){
+                manager = managerOptional.get();
+            } else {
+                throw new NotFoundError("Manager not found.");
+            }
+
+            agent.setManager(manager);
             agent = agentRepository.save(agent);
 
-        }catch (Exception a){
-            a.printStackTrace();
-            throw new ApiError(a.getMessage());
+        }catch (Exception ex){
+            ex.printStackTrace();
+            throw ex;
         }
         return agent;
     }

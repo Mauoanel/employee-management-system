@@ -5,13 +5,13 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ApiError extends RuntimeException{
+public class ExistsError extends RuntimeException{
 
     private String message;
     private ErrorMessage errorMessage;
     private String errorType = this.getClass().getSimpleName();
 
-    public ApiError(String message) {
+    public ExistsError(String message) {
         super(message);
         this.message = message;
         this.errorMessage = new ErrorMessage(message);

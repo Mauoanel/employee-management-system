@@ -2,6 +2,8 @@ package com.xib.assessment.controller;
 
 
 import com.xib.assessment.apirerror.ApiError;
+import com.xib.assessment.apirerror.NotFoundError;
+import com.xib.assessment.apirerror.ServiceSubExistError;
 import com.xib.assessment.dto.TeamDto;
 import com.xib.assessment.services.TeamService;
 import org.springframework.http.HttpStatus;
@@ -19,47 +21,27 @@ public class TeamController {
     }
 
     @GetMapping
-    public ResponseEntity findAllTeams(){
-        try {
-            return new ResponseEntity<>(teamService.findAllTeams(), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity findAllTeams() throws NotFoundError {
+        return new ResponseEntity<>(teamService.findAllTeams(), HttpStatus.OK);
     }
 
     @GetMapping("empty/managers/agents")
-    public ResponseEntity findTeamsWithNoManagersAndAgents(){
-        try {
-            return new ResponseEntity<>(teamService.findTeamsWithNoManagersAndAgents(), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity findTeamsWithNoManagersAndAgents() {
+        return new ResponseEntity<>(teamService.findTeamsWithNoManagersAndAgents(), HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity findTeam(@PathVariable("id") long id){
-        try {
-            return new ResponseEntity<>(teamService.findTeam(id), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity findTeam(@PathVariable("id") long id) throws NotFoundError {
+        return new ResponseEntity<>(teamService.findTeam(id), HttpStatus.OK);
     }
 
     @PutMapping("{id}/agent")
-    public ResponseEntity assignAgentToTeam(@PathVariable("id") long id, @RequestBody TeamDto teamDto){
-        try {
-            return new ResponseEntity<>(teamService.assignAgentToTeam(teamDto, id), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity assignAgentToTeam(@PathVariable("id") long id, @RequestBody TeamDto teamDto) throws ServiceSubExistError, NotFoundError {
+        return new ResponseEntity<>(teamService.assignAgentToTeam(teamDto, id), HttpStatus.OK);
     }
 
     @PostMapping()
-    public ResponseEntity createTeam(@RequestBody TeamDto teamDto ){
-        try {
-            return new ResponseEntity<>( teamService.saveTeam(teamDto), HttpStatus.OK);
-        } catch (ApiError apiError) {
-            return new ResponseEntity<>(apiError.getBusinessRuleMessage(), HttpStatus.BAD_REQUEST);
-        }
+    public ResponseEntity createTeam(@RequestBody TeamDto teamDto) {
+        return new ResponseEntity<>(teamService.saveTeam(teamDto), HttpStatus.OK);
     }
 }
