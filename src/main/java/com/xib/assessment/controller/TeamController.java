@@ -1,11 +1,10 @@
 package com.xib.assessment.controller;
 
 
-import com.xib.assessment.apirerror.ApiError;
 import com.xib.assessment.apirerror.NotFoundError;
 import com.xib.assessment.apirerror.ServiceSubExistError;
 import com.xib.assessment.dto.TeamDto;
-import com.xib.assessment.services.TeamService;
+import com.xib.assessment.services.interfaces.TeamServiceInf;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("team/")
 public class TeamController {
 
-    private final TeamService teamService;
+    private final TeamServiceInf teamService;
 
-    public TeamController(TeamService teamService) {
+    public TeamController(TeamServiceInf teamService) {
         this.teamService = teamService;
     }
 

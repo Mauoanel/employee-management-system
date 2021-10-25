@@ -110,7 +110,7 @@ public class GlobalExceptionHandler {
         } else if (ex instanceof ApiError) {
             body.put("errorType", ((ApiError) ex).getErrorType());
             body.put("errorMessage", ((ApiError) ex).getErrorMessage());
-        } else if (ex instanceof Exception) {
+        } else {
             return new ResponseEntity<>(ex.getMessage(), headers, status);
         }
 

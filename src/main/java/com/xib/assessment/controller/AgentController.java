@@ -1,11 +1,10 @@
 package com.xib.assessment.controller;
 
-import com.xib.assessment.apirerror.ApiError;
 import com.xib.assessment.apirerror.ExistsError;
 import com.xib.assessment.apirerror.MandatoryFieldError;
 import com.xib.assessment.apirerror.NotFoundError;
-import com.xib.assessment.services.AgentService;
 import com.xib.assessment.dto.AgentDto;
+import com.xib.assessment.services.interfaces.AgentServiceInf;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +15,9 @@ import javax.validation.constraints.NotNull;
 @RequestMapping("agent/")
 public class AgentController {
 
-    private final AgentService agentService;
+    private final AgentServiceInf agentService;
 
-    public AgentController(AgentService agentService) {
+    public AgentController(AgentServiceInf agentService) {
         this.agentService = agentService;
     }
 

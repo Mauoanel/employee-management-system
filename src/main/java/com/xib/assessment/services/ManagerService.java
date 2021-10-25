@@ -7,19 +7,18 @@ import com.xib.assessment.apirerror.NotFoundError;
 import com.xib.assessment.apirerror.ServiceSubExistError;
 import com.xib.assessment.assembler.AppAssembler;
 import com.xib.assessment.dto.ManagerDto;
-import com.xib.assessment.entity.Agent;
 import com.xib.assessment.entity.Manager;
 import com.xib.assessment.entity.Team;
 import com.xib.assessment.repository.ManagerRepository;
 import com.xib.assessment.repository.TeamRepository;
-import org.hibernate.validator.internal.constraintvalidators.bv.notempty.NotEmptyValidatorForArray;
+import com.xib.assessment.services.interfaces.ManagerServiceInf;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.util.Set;
 
 @Service
-public class ManagerService {
+public class ManagerService implements ManagerServiceInf {
 
     private final ManagerRepository managerRepository;
     private final TeamRepository teamRepository;
@@ -29,12 +28,7 @@ public class ManagerService {
         this.teamRepository = teamRepository;
     }
 
-    /**
-     * Create a new Manager on the database
-     * @param managerDto
-     * @return saved manager
-     * @throws ApiError: if team exists or mandatory fields are empty
-     */
+    @Override
     public Manager saveManager(ManagerDto managerDto) throws ApiError {
 
         Manager manager = AppAssembler.assembleManager(managerDto);
@@ -52,13 +46,7 @@ public class ManagerService {
         return manager;
     }
 
-    /**
-     * Assigns a manager to a team.
-     * @param managerIdNumber
-     * @param teamId
-     * @return
-     * @throws ApiError
-     */
+    @Override
     public Team assignManagerToTeam(String managerIdNumber, long teamId) throws ApiError, NotFoundError {
 
         Manager manager;
@@ -96,13 +84,7 @@ public class ManagerService {
     }
 
 
-    /**
-     * Unassigns a manager from a team
-     * @param managerIdNumber
-     * @param teamId
-     * @return
-     * @throws ApiError
-     */
+    @Override
     public Team unassignManagerToTeam(String managerIdNumber, long teamId) throws ApiError, ServiceSubExistError, NotFoundError {
 
         Manager manager;
@@ -155,12 +137,7 @@ public class ManagerService {
         return team;
     }
 
-    /**
-     * Finds a manager in the database
-     * @param managerIdNumber: Id Document Number
-     * @return manager
-     * @throws ApiError
-     */
+    @Override
     public Manager findManager(@NotNull String managerIdNumber) throws ApiError, NotFoundError {
         try {
             Manager manager = managerRepository.findByIdNumberIgnoreCase(managerIdNumber);

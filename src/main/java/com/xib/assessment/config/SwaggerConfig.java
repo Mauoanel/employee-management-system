@@ -32,7 +32,7 @@ public class SwaggerConfig {
                 "Call Center Employee Management API",
                 "API.0.01",
                 "Terms of service",
-                new Contact("XiB", "http://www.xib.co.za", "info@xib.co.za"),
+                new Contact("Dynamic Devs", "http://www.dynamic-devs.co.za", "info@dynamic-devs.co.za"),
                 "License of API", "API license URL", Collections.emptyList());
     }
 }

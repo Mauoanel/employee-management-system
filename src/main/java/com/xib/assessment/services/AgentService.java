@@ -11,6 +11,7 @@ import com.xib.assessment.repository.AgentRepository;
 import com.xib.assessment.apirerror.ApiError;
 import com.xib.assessment.dto.AgentDto;
 import com.xib.assessment.repository.ManagerRepository;
+import com.xib.assessment.services.interfaces.AgentServiceInf;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class AgentService {
+public class AgentService implements AgentServiceInf {
 
     private final AgentRepository agentRepository;
     private final ManagerRepository managerRepository;
@@ -32,14 +33,7 @@ public class AgentService {
     }
 
 
-    /**
-     * Finds All Agents on the database
-     * Applies pagination
-     * @return a list of agents
-     * @throws ApiError if no agents found.
-     * @param pageNo : specifies the page number
-     * @param pageSize : specifies the number of items(size) on the page
-     */
+    @Override
     public List<Agent> findAllAgentsWithPaging(Integer pageNo, Integer pageSize) throws ApiError, NotFoundError {
 
         Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by("id"));
@@ -55,11 +49,8 @@ public class AgentService {
 
         return agents;
     }
-    /**
-     * Finds All Agents on the database
-     * @return a list of agents
-     * @throws ApiError if no agents found.
-     */
+
+    @Override
     public List<Agent> findAllAgents() throws ApiError, NotFoundError {
 
         List<Agent> agents = agentRepository.findAll();
@@ -70,13 +61,7 @@ public class AgentService {
         return agents;
     }
 
-    /**
-     * Finds the Agent
-     *
-     * @param id: agent pk: identification
-     * @return :
-     * @throws ApiError
-     */
+    @Override
     public Agent findAgent(long id) throws NotFoundError {
 
         try {
@@ -89,12 +74,7 @@ public class AgentService {
     }
 
 
-    /**
-     * Create a new Agent on the database
-     * @param agentDto
-     * @return saved agent
-     * @throws ApiError: if agent exists or mandatory fields are empty
-     */
+    @Override
     public Agent saveAgent(AgentDto agentDto) throws NotFoundError, MandatoryFieldError, ExistsError {
 
         Agent agent = AppAssembler.assembleAgent(agentDto);

@@ -6,23 +6,21 @@ import com.xib.assessment.apirerror.ExistsError;
 import com.xib.assessment.apirerror.NotFoundError;
 import com.xib.assessment.apirerror.ServiceSubExistError;
 import com.xib.assessment.assembler.AppAssembler;
-import com.xib.assessment.dto.AgentDto;
 import com.xib.assessment.dto.TeamDto;
 import com.xib.assessment.entity.Agent;
 import com.xib.assessment.entity.Manager;
 import com.xib.assessment.entity.Team;
 import com.xib.assessment.repository.AgentRepository;
 import com.xib.assessment.repository.TeamRepository;
-import org.hibernate.annotations.NotFound;
+import com.xib.assessment.services.interfaces.TeamServiceInf;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
-public class TeamService {
+public class TeamService implements TeamServiceInf {
 
     private final AgentRepository agentRepository;
     private final TeamRepository teamRepository;
@@ -32,13 +30,7 @@ public class TeamService {
         this.teamRepository = teamRepository;
     }
 
-
-    /**
-     * Finds All Teams on the database
-     *
-     * @return a list of teams
-     * @throws ApiError if no team found.
-     */
+    @Override
     public List<Team> findAllTeams() throws ApiError, NotFoundError {
         List<Team> teams = teamRepository.findAll();
 
@@ -48,14 +40,8 @@ public class TeamService {
         return teams;
     }
 
-    /**
-     * Assign an agent to an existing team.
-     * @param teamDto team details
-     * @param agentId agent id
-     * @return agent and team associated to
-     * @throws ApiError
-     */
-    public Agent assignAgentToTeam(TeamDto teamDto,long agentId) throws ApiError, ServiceSubExistError, NotFoundError {
+    @Override
+    public Agent assignAgentToTeam(TeamDto teamDto, long agentId) throws ApiError, ServiceSubExistError, NotFoundError {
 
         Agent agent;
         Team team;
@@ -105,12 +91,7 @@ public class TeamService {
         return agent;
     }
 
-    /**
-     * Finds a team by Id
-     * @param id of the team
-     * @return specified team
-     * @throws ApiError
-     */
+    @Override
     public Team findTeam(@NotNull long id) throws NotFoundError {
         try {
 
@@ -122,12 +103,7 @@ public class TeamService {
         }
     }
 
-    /**
-     * Create a new Team on the database
-     * @param teamDto team to be saved on the db
-     * @return saved agent
-     * @throws ApiError: if team exists or mandatory fields are empty
-     */
+    @Override
     public Team saveTeam(TeamDto teamDto) throws ExistsError {
 
         Team team = AppAssembler.assembleTeam(teamDto);
@@ -145,12 +121,7 @@ public class TeamService {
         return team;
     }
 
-
-    /**
-     * Find team with no agents and managers
-     * @return saved agent
-     * @throws ApiError: if team exists or mandatory fields are empty
-     */
+    @Override
     public List<Team> findTeamsWithNoManagersAndAgents() throws ApiError {
 
         try {
